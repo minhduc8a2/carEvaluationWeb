@@ -39,16 +39,24 @@ const Home = () => {
         }}
         onSubmit={async (values, { setSubmitting }) => {
           try {
-            const response = await fetch("http://localhost:55000/predict", {
+            const sentData = {
+              buying: values.buying,
+              maint: values.maint,
+              doors: values.doors,
+              persons: values.persons,
+              lug_boot: values.lug_boot,
+              safety: values.safety,
+            }
+            console.log(sentData)
+            const response = await fetch("http://localhost:55002/predict", {
               method: "POST",
-              body: JSON.stringify({
-                buying: values.buying,
-                maint: values.maint,
-                doors: values.doors,
-                persons: values.persons,
-                lug_boot: values.lug_boot,
-                safety: values.safety,
-              }),
+
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+              },
+
+              body: JSON.stringify(sentData),
             })
             const data = await response.json()
             console.log(data)
