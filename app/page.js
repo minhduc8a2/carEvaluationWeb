@@ -4,6 +4,7 @@ import { Formik, Field } from "formik"
 import { useState, useEffect } from "react"
 const Home = () => {
   const [nhan, setNhan] = useState("")
+  const [domain, setDomain] = useState("")
   return (
     <div className="container mx-auto mt-24 px-4 mb-24">
       <h1 className="text-5xl text-center mb-16 bg-blue-400 p-4 rounded-lg text-white">
@@ -22,6 +23,15 @@ const Home = () => {
           <h4 className="text-xl mb-4">3. Giang Đại Huy</h4>
         </li>
       </ul>
+      <div className="my-8 border w-fit p-4">
+        <h3 className="text-xl my-4">Nhập Domain API</h3>
+        <input
+          type="text"
+          value={domain}
+          className="border"
+          onChange={(e) => setDomain(e.target.value)}
+        />
+      </div>
 
       <Formik
         initialValues={{
@@ -48,7 +58,7 @@ const Home = () => {
               safety: values.safety,
             }
             console.log(sentData)
-            const response = await fetch("http://localhost:55002/predict", {
+            const response = await fetch(domain + "/predict", {
               method: "POST",
 
               headers: {
@@ -59,9 +69,10 @@ const Home = () => {
               body: JSON.stringify(sentData),
             })
             const data = await response.json()
-            console.log(data)
+            if (data.result) setNhan(data.result)
+            else alert("Lỗi API! Vui lòng nhập lại Domain name của API.")
           } catch (error) {
-            console.error("Fetch error:", error)
+            alert("Lỗi API! Vui lòng nhập lại Domain name của API.")
           }
         }}
       >
