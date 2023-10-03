@@ -1,113 +1,343 @@
-import Image from 'next/image'
-
-export default function Home() {
+"use client"
+import React from "react"
+import { Formik, Field } from "formik"
+import { useState, useEffect } from "react"
+const Home = () => {
+  const [nhan, setNhan] = useState("")
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.js</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+    <div className="container mx-auto mt-24 px-4 mb-24">
+      <h1 className="text-5xl text-center mb-16 bg-blue-400 p-4 rounded-lg text-white">
+        Mô hình đánh giá xe ô tô Car Evaluation
+      </h1>
+      <h2 className="text-3xl mb-8">Nhóm học phần CT294/02</h2>
+      <h3 className="text-2xl mb-4">Các thành viên:</h3>
+      <ul className="">
+        <li className="mb-4">
+          <h4 className="text-xl mb-4">1. Lê Minh Đức</h4>
+        </li>
+        <li className="mb-4">
+          <h4 className="text-xl mb-4">2. Nguyễn Hoàng Duy</h4>
+        </li>
+        <li className="mb-4">
+          <h4 className="text-xl mb-4">3. Giang Đại Huy</h4>
+        </li>
+      </ul>
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+      <Formik
+        initialValues={{
+          buying: "vhigh",
+          maint: "vhigh",
+          doors: "2",
+          persons: "2",
+          lug_boot: "small",
+          safety: "low",
+        }}
+        validate={(values) => {
+          const errors = {}
 
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
+          return errors
+        }}
+        onSubmit={async (values, { setSubmitting }) => {
+          try {
+            const response = await fetch("http://localhost:55000/predict", {
+              method: "POST",
+              body: JSON.stringify({
+                buying: values.buying,
+                maint: values.maint,
+                doors: values.doors,
+                persons: values.persons,
+                lug_boot: values.lug_boot,
+                safety: values.safety,
+              }),
+            })
+            const data = await response.json()
+            console.log(data)
+          } catch (error) {
+            console.error("Fetch error:", error)
+          }
+        }}
+      >
+        {({
+          values,
+          errors,
+          touched,
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          isSubmitting,
+          /* and other goodies */
+        }) => (
+          <form onSubmit={handleSubmit}>
+            <h3 className="text-2xl mb-4">
+              Mời bạn chọn giá trị các thuộc tính để đánh giá
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div
+                role="group"
+                aria-labelledby="buying-group"
+                className="border p-8 border-blue-400"
+              >
+                <h5 className="text-xl mb-2 font-semibold">Buying:</h5>
+                <label className="mr-4">
+                  <Field
+                    className="mr-2"
+                    type="radio"
+                    name="buying"
+                    value="vhigh"
+                  />
+                  vhigh
+                </label>
+                <label className="mr-4">
+                  <Field
+                    className="mr-2"
+                    type="radio"
+                    name="buying"
+                    value="high"
+                  />
+                  high
+                </label>
+                <label className="mr-4">
+                  <Field
+                    className="mr-2"
+                    type="radio"
+                    name="buying"
+                    value="med"
+                  />
+                  med
+                </label>
+                <label className="mr-4 ">
+                  <Field
+                    className="mr-2"
+                    type="radio"
+                    name="buying"
+                    value="low"
+                  />
+                  low
+                </label>
+                <div className="mt-4">
+                  Bạn đã chọn:{" "}
+                  <span className="font-bold text-red-500">
+                    {values.buying}
+                  </span>
+                </div>
+              </div>
+              <div
+                role="group"
+                aria-labelledby="maint-group"
+                className="border p-8 border-blue-400"
+              >
+                <h5 className="text-xl mb-2 font-semibold">Maint:</h5>
+                <label className="mr-4">
+                  <Field
+                    className="mr-2"
+                    type="radio"
+                    name="maint"
+                    value="vhigh"
+                  />
+                  vhigh
+                </label>
+                <label className="mr-4">
+                  <Field
+                    className="mr-2"
+                    type="radio"
+                    name="maint"
+                    value="high"
+                  />
+                  high
+                </label>
+                <label className="mr-4">
+                  <Field
+                    className="mr-2"
+                    type="radio"
+                    name="maint"
+                    value="med"
+                  />
+                  med
+                </label>
+                <label className="mr-4 ">
+                  <Field
+                    className="mr-2"
+                    type="radio"
+                    name="maint"
+                    value="low"
+                  />
+                  low
+                </label>
+                <div className="mt-4">
+                  Bạn đã chọn:{" "}
+                  <span className="font-bold text-red-500">{values.maint}</span>
+                </div>
+              </div>
+              <div
+                role="group"
+                aria-labelledby="doors-group"
+                className="border p-8 border-blue-400"
+              >
+                <h5 className="text-xl mb-2 font-semibold">doors:</h5>
+                <label className="mr-4">
+                  <Field className="mr-2" type="radio" name="doors" value="2" />
+                  2
+                </label>
+                <label className="mr-4">
+                  <Field className="mr-2" type="radio" name="doors" value="3" />
+                  3
+                </label>
+                <label className="mr-4">
+                  <Field className="mr-2" type="radio" name="doors" value="4" />
+                  4
+                </label>
+                <label className="mr-4 ">
+                  <Field
+                    className="mr-2"
+                    type="radio"
+                    name="doors"
+                    value="5more"
+                  />
+                  5more
+                </label>
+                <div className="mt-4">
+                  Bạn đã chọn:{" "}
+                  <span className="font-bold text-red-500">{values.doors}</span>
+                </div>
+              </div>
+              <div
+                role="group"
+                aria-labelledby="persons-group"
+                className="border p-8 border-blue-400"
+              >
+                <h5 className="text-xl mb-2 font-semibold">persons:</h5>
+                <label className="mr-4">
+                  <Field
+                    className="mr-2"
+                    type="radio"
+                    name="persons"
+                    value="2"
+                  />
+                  2
+                </label>
+                <label className="mr-4">
+                  <Field
+                    className="mr-2"
+                    type="radio"
+                    name="persons"
+                    value="4"
+                  />
+                  4
+                </label>
+                <label className="mr-4">
+                  <Field
+                    className="mr-2"
+                    type="radio"
+                    name="persons"
+                    value="more"
+                  />
+                  more
+                </label>
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800 hover:dark:bg-opacity-30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
+                <div className="mt-4">
+                  Bạn đã chọn:{" "}
+                  <span className="font-bold text-red-500">
+                    {values.persons}
+                  </span>
+                </div>
+              </div>
+              <div
+                role="group"
+                aria-labelledby="lug_boot-group"
+                className="border p-8 border-blue-400"
+              >
+                <h5 className="text-xl mb-2 font-semibold">lug_boot:</h5>
+                <label className="mr-4">
+                  <Field
+                    className="mr-2"
+                    type="radio"
+                    name="lug_boot"
+                    value="small"
+                  />
+                  small
+                </label>
+                <label className="mr-4">
+                  <Field
+                    className="mr-2"
+                    type="radio"
+                    name="lug_boot"
+                    value="med"
+                  />
+                  med
+                </label>
+                <label className="mr-4">
+                  <Field
+                    className="mr-2"
+                    type="radio"
+                    name="lug_boot"
+                    value="big"
+                  />
+                  big
+                </label>
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
+                <div className="mt-4">
+                  Bạn đã chọn:{" "}
+                  <span className="font-bold text-red-500">
+                    {values.lug_boot}
+                  </span>
+                </div>
+              </div>
+              <div
+                role="group"
+                aria-labelledby="safety-group"
+                className="border p-8 border-blue-400"
+              >
+                <h5 className="text-xl mb-2 font-semibold">safety:</h5>
+                <label className="mr-4">
+                  <Field
+                    className="mr-2"
+                    type="radio"
+                    name="safety"
+                    value="low"
+                  />
+                  low
+                </label>
+                <label className="mr-4">
+                  <Field
+                    className="mr-2"
+                    type="radio"
+                    name="safety"
+                    value="med"
+                  />
+                  med
+                </label>
+                <label className="mr-4">
+                  <Field
+                    className="mr-2"
+                    type="radio"
+                    name="safety"
+                    value="high"
+                  />
+                  high
+                </label>
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+                <div className="mt-4">
+                  Bạn đã chọn:{" "}
+                  <span className="font-bold text-red-500">
+                    {values.safety}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-blue-500 text-white rounded-lg mt-4 py-2 px-4"
+            >
+              Dự đoán nhãn
+            </button>
+          </form>
+        )}
+      </Formik>
+      <h2 className="text-3xl my-8">Nhãn được dự đoán là: {nhan}</h2>
+    </div>
   )
 }
+
+export default Home
