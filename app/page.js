@@ -4,7 +4,7 @@ import { Formik, Field } from "formik"
 import { useState, useEffect } from "react"
 const Home = () => {
   const [nhan, setNhan] = useState("")
-  const [domain, setDomain] = useState("")
+  const [domain, setDomain] = useState("https://minhduc8a2.pythonanywhere.com")
   return (
     <div className="container mx-auto mt-24 px-4 mb-24">
       <h1 className="text-5xl text-center mb-16 bg-blue-400 p-4 rounded-lg text-white">
@@ -59,16 +59,15 @@ const Home = () => {
             }
             console.log(sentData)
             const response = await fetch(domain + "/predict", {
+              cache: "no-cache",
               method: "POST",
-
               headers: {
-                Accept: "application/json",
                 "Content-Type": "application/json",
               },
-
               body: JSON.stringify(sentData),
             })
             const data = await response.json()
+            console.log(data)
             if (data.result) setNhan(data.result)
             else alert("Lỗi API! Vui lòng nhập lại Domain name của API.")
           } catch (error) {
